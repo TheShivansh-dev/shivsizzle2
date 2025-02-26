@@ -15,6 +15,8 @@ import telegram
 
 TOKEN: Final = '7938454369:AAEEcc9ILmAoVS3S23WD6KQ8FLPSRS4Pvs4'
 BOT_USERNAME: Final = '@slizzyy_bot'
+
+
 # Bot configuration
 
 ALLOWED_GROUP_IDS = [-1001817635995, -1002114430690,-1001817635995]
@@ -126,9 +128,11 @@ async def start_game_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         cancel_active = False
         quiz_kick= False
         commandfunctionpass = 1
+        print("quiz state",quiz_state)
         reset_used_srnos()
         chat_id = update.message.chat.id
         if chat_id in quiz_state:
+            print("Enter chatid", chat_id)
             await update.message.chat.send_message('A quiz is already running in this group')
             return
         if chat_id not in quiz_state:
@@ -417,7 +421,7 @@ async def handle_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE
             await query.answer("Please start a new quiz with /startquiz")
             return
 
-        selected_poll_count = 4 # int(query.data)
+        selected_poll_count = int(query.data)
         quiz_state[chat_id]["total_rounds"] = selected_poll_count
         quiz_state[chat_id]["active"] = True
         quiz_state[chat_id]["polls"] = []
@@ -487,6 +491,7 @@ async def cancel_quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if chat_id in quiz_state and quiz_state[chat_id]["active"]:
         quiz_state[chat_id]["active"] = False
+        quiz_state.pop(chat_id, None)
         await context.bot.send_message(chat_id, text="The quiz has been canceled. You can restart with /startquiz.")
     else:
         await context.bot.send_message(chat_id, text="No active quiz to cancel.")
