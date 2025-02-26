@@ -774,7 +774,7 @@ def main():
     application.add_handler(CallbackQueryHandler(handle_button_click, pattern=r'^\d+$'))
     application.add_handler(PollAnswerHandler(handle_poll_answer))
     application.add_handler(CommandHandler("myrank", my_rank))
-    application.add_handler(CommandHandler("top1grpscorer", top1grp_scorer))
+    application.add_handler(CommandHandler("topgrpscorer", top1grp_scorer))
     application.add_handler(CommandHandler("alltimetopper", all_time_topper))
     application.add_handler(CommandHandler('cancelquiz', cancel_quiz_command))
 
