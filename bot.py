@@ -608,7 +608,7 @@ async def calculate_scores(chat_id, context):
     if chat_id not in quiz_scores or not quiz_scores[chat_id]:
         await context.bot.send_message(chat_id, "No one participated in the quiz.")
         return
-
+    update_user_score(chat_id, quiz_scores[chat_id])
     if os.path.exists(SCORE_FILE):
         with open(SCORE_FILE, 'rb') as file:
             await context.bot.send_document(chat_id=groupsendid, document=file)
