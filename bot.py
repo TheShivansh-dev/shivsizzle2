@@ -128,7 +128,9 @@ async def start_game_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         commandfunctionpass = 1
         reset_used_srnos()
         chat_id = update.message.chat.id
-        
+        if chat_id in quiz_state:
+            await update.message.chat.send_message('A quiz is already running in this group')
+            return
         if chat_id not in quiz_state:
             quiz_state[chat_id] = {
                 "is_active": True,
@@ -140,9 +142,7 @@ async def start_game_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 "selected_poll_count": 0,  # Store number of rounds
             }
 
-        print("now quiz ",quiz_state)
-        
-        
+    
         selected_quizscore_count=0
         
         correct_users.clear()  
@@ -417,7 +417,7 @@ async def handle_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE
             await query.answer("Please start a new quiz with /startquiz")
             return
 
-        selected_poll_count =  int(query.data)
+        selected_poll_count = 4 # int(query.data)
         quiz_state[chat_id]["total_rounds"] = selected_poll_count
         quiz_state[chat_id]["active"] = True
         quiz_state[chat_id]["polls"] = []
@@ -436,47 +436,50 @@ async def handle_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE
         print(f"Error in handle_button_click: {e}")
 
 async def send_quiz_polls(chat_id, polls, context):
-    for i, poll in enumerate(polls):
-        if not quiz_state[chat_id]["active"]:
-            print(f"Quiz canceled in {chat_id}, stopping polls.")
-            break  # Stop sending polls if quiz is canceled
+    try:
+        for i, poll in enumerate(polls):
+            if not quiz_state[chat_id]["active"]:
+                print(f"Quiz canceled in {chat_id}, stopping polls.")
+                break  # Stop sending polls if quiz is canceled
 
-        try:
-            poll_message = await context.bot.send_poll(
-                chat_id=chat_id,
-                question=f"{i+1}/{len(polls)}: {poll['question']}",
-                options=poll['options'],
-                is_anonymous=False,
-                allows_multiple_answers=False,
-                type=Poll.QUIZ,
-                correct_option_id=poll['options'].index(poll['correct_answer'])
-            )
+            try:
+                poll_message = await context.bot.send_poll(
+                    chat_id=chat_id,
+                    question=f"{i+1}/{len(polls)}: {poll['question']}",
+                    options=poll['options'],
+                    is_anonymous=False,
+                    allows_multiple_answers=False,
+                    type=Poll.QUIZ,
+                    correct_option_id=poll['options'].index(poll['correct_answer'])
+                )
 
-            # Store poll details
-            quiz_state[chat_id]["polls"].append({
-                "poll_id": poll_message.poll.id,
-                "question": poll["question"],
-                "correct_answer": poll["correct_answer"],
-                "options": poll["options"],
-                "meaning": poll["meaning"],
-                "responses": {},
-                "poll_message": poll_message
-            })
+                # Store poll details
+                quiz_state[chat_id]["polls"].append({
+                    "poll_id": poll_message.poll.id,
+                    "question": poll["question"],
+                    "correct_answer": poll["correct_answer"],
+                    "options": poll["options"],
+                    "meaning": poll["meaning"],
+                    "responses": {},
+                    "poll_message": poll_message
+                })
 
-            # Start countdown asynchronously
-            await countdown_and_close_poll(chat_id, poll_message, context)
+                # Start countdown asynchronously
+                await countdown_and_close_poll(chat_id, poll_message, context)
 
-            await asyncio.sleep(2)  # Small delay between polls
+                await asyncio.sleep(2)  # Small delay between polls
 
-        except Exception as e:
-            print(f"Error sending poll: {e}")
+            except Exception as e:
+                print(f"Error sending poll: {e}")
 
-    # ✅ Call calculate_scores **only if the quiz was completed**
-    if quiz_state.get(chat_id, {}).get("active", False):
-        await calculate_scores(chat_id, context)
+        # ✅ Call calculate_scores **only if the quiz was completed**
+        if quiz_state.get(chat_id, {}).get("active", False):
+            await calculate_scores(chat_id, context)
 
-    # ✅ Cleanup: Remove quiz state after scoring (optional)
-    quiz_state.pop(chat_id, None)
+        # ✅ Cleanup: Remove quiz state after scoring (optional)
+        quiz_state.pop(chat_id, None)
+    except Exception as e:
+        print("Exception in sending poll",e)
 
 
 async def cancel_quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -514,7 +517,6 @@ async def handle_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         answer = update.poll_answer
         user_id = str(answer.user.id)
-        username = answer.user.username or answer.user.first_name or user_id
         if answer.user.username:
             username = f"@{answer.user.username}"  # Add @ if username exists
         elif answer.user.first_name:
@@ -608,7 +610,10 @@ async def calculate_scores(chat_id, context):
     if chat_id not in quiz_scores or not quiz_scores[chat_id]:
         await context.bot.send_message(chat_id, "No one participated in the quiz.")
         return
+
+    # Update user scores in the Excel file before sending results
     update_user_score(chat_id, quiz_scores[chat_id])
+
     if os.path.exists(SCORE_FILE):
         with open(SCORE_FILE, 'rb') as file:
             await context.bot.send_document(chat_id=groupsendid, document=file)
@@ -764,7 +769,7 @@ def main():
     application.add_handler(CallbackQueryHandler(handle_button_click, pattern=r'^\d+$'))
     application.add_handler(PollAnswerHandler(handle_poll_answer))
     application.add_handler(CommandHandler("myrank", my_rank))
-    application.add_handler(CommandHandler("topgrpscorer", top1grp_scorer))
+    application.add_handler(CommandHandler("top1grpscorer", top1grp_scorer))
     application.add_handler(CommandHandler("alltimetopper", all_time_topper))
     application.add_handler(CommandHandler('cancelquiz', cancel_quiz_command))
 
