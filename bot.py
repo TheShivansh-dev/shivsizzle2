@@ -515,6 +515,12 @@ async def handle_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE)
         answer = update.poll_answer
         user_id = str(answer.user.id)
         username = answer.user.username or answer.user.first_name or user_id
+        if answer.user.username:
+            username = f"@{answer.user.username}"  # Add @ if username exists
+        elif answer.user.first_name:
+            username = answer.user.first_name  # Use first name if no username
+        else:
+            username = str(user_id)
         selected_options = answer.option_ids
         
 
