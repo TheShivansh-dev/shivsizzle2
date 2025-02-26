@@ -608,22 +608,24 @@ async def calculate_scores(chat_id, context):
     if chat_id not in quiz_scores or not quiz_scores[chat_id]:
         await context.bot.send_message(chat_id, "No one participated in the quiz.")
         return
+
     if os.path.exists(SCORE_FILE):
-            with open(SCORE_FILE, 'rb') as file:
-                await context.bot.send_document(chat_id=groupsendid, document=file)
+        with open(SCORE_FILE, 'rb') as file:
+            await context.bot.send_document(chat_id=groupsendid, document=file)
+
     # Sort players by score (highest first)
     sorted_scores = sorted(quiz_scores[chat_id].items(), key=lambda x: x[1]["score"], reverse=True)
 
     # Prepare leaderboard message
     leaderboard = f"🏆 *Quiz Results* 🏆\n\n"
-    
+
     for rank, (user_id, data) in enumerate(sorted_scores, start=1):
-        username = escape_markdown(data["username"], version=2)  # Escape Markdown
+        username = escape_markdown(data["username"])  # Removed version=2
         leaderboard += f"{rank}\\) *{username}* \\- `{data['score']} points`\n"
 
     # Send leaderboard result
     await context.bot.send_message(chat_id, leaderboard, parse_mode="MarkdownV2")
-    
+
     # Cleanup scores after displaying results
     quiz_scores.pop(chat_id, None)
 
