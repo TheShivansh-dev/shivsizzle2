@@ -807,6 +807,7 @@ def main():
     application.add_handler(CommandHandler("topgrpscorer", top1grp_scorer))
     application.add_handler(CommandHandler("alltimetopper", all_time_topper))
     application.add_handler(CommandHandler('cancelquiz', cancel_quiz_command))
+    application.add_handler(CommandHandler('updatesizzlescore', handle_updatesizzlescore))
 
     # Start the bot
     application.run_polling()
