@@ -13,7 +13,7 @@ import time
 from telegram.error import Forbidden,BadRequest, TimedOut
 import telegram
 
-TOKEN: Final = '7938454369:AAEEcc9ILmAoVS3S23WD6KQ8FLPSRS4Pvs4'
+TOKEN: Final = '7938454369:AAHvTD7J-C2OozXpu4XQc-rvjQNOLhgrO6s'
 BOT_USERNAME: Final = '@slizzyy_bot'
 
 
