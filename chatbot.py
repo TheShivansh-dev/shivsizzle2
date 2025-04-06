@@ -21,7 +21,7 @@ import speech_recognition as sr
 
 # Your bot token and username
 # Your bot token and username
-TOKEN: Final = '7641472874:AAFDXJtMzjPdn9k9FdQBTs6ZKiWTY9dRDtg'
+TOKEN: Final = '7641472874:AAE8-yQDwGwWyPWVcZHiRvPrx2KvAz-d-Rk'
 BOT_USERNAME: Final = '@Vamiika_bot'
 
 #TOKEN: Final = '6991746723:AAHx0aqfY-S_PelA80TRh3aKBFe0yRWsLL8'
