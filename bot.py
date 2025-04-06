@@ -260,7 +260,7 @@ async def handle_type_selection(update: Update, context: ContextTypes.DEFAULT_TY
             difficulty_keyboard = [
                 [InlineKeyboardButton("Synonyms", callback_data='difficulty_synonyms')],
                 [InlineKeyboardButton("Antonyms", callback_data='difficulty_antonyms')],
-                [InlineKeyboardButton("Spelling Correction", callback_data='difficulty_spellcorr')],
+                [InlineKeyboardButton("Spelling Correction 2.0", callback_data='difficulty_spellcorr')],
                 [InlineKeyboardButton("Daily Life Idioms", callback_data='difficulty_shortIdiom')],
                 [InlineKeyboardButton("Sentence Correction", callback_data='difficulty_sentcorr')],
             ]
