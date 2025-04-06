@@ -130,6 +130,7 @@ async def start_game_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         commandfunctionpass = 1
         print("quiz state",quiz_state)
         reset_used_srnos()
+        chat_id = update.message.chat.id
         if chat_id not in ALLOWED_GROUP_IDS:
             try:
                 
@@ -139,7 +140,7 @@ async def start_game_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 chat_id = -1001817635995
                 await update.message.chat.send_message("To Make your Own Bot and Start The Quiz In Your Group Talk to the Bot Creater @O000000000O00000000O")
             return
-        chat_id = update.message.chat.id
+       
         if chat_id in quiz_state:
             print("Enter chatid", chat_id)
             await update.message.chat.send_message('A quiz is already running in this group')
