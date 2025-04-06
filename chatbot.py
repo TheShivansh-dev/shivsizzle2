@@ -701,7 +701,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("addStick", add_sticker_user))
     app.add_handler(MessageHandler(filters.Sticker.ALL, handle_sticker))
     app.add_handler(MessageHandler(filters.ANIMATION, handle_gif))
-    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    #app.add_handler(MessageHandler(filters.VOICE, handle_voice))
     app.add_error_handler(error)
 
     print('Polling the bot...')
