@@ -197,6 +197,26 @@ def Nda_keyboard2():
         
     ]
 
+async def handle_updatesizzlescore(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+
+    if chat_id == groupsendid and update.message.reply_to_message and update.message.reply_to_message.document:
+        try:
+            file = await context.bot.get_file(update.message.reply_to_message.document.file_id)
+            downloaded_path = await file.download_to_drive()
+
+            # Replace existing userscore.xlsx
+            if os.path.exists(SCORE_FILE):
+                os.remove(SCORE_FILE)
+
+            os.rename(downloaded_path, SCORE_FILE)
+
+            await update.message.reply_text("✅ Score file updated successfully.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Failed to update score file:\n`{e}`", parse_mode="Markdown")
+    else:
+        await update.message.reply_text("⚠️ Please reply to an .xlsx file in the allowed group.")
+
 #================================================================Option buttons For Quiz Type 
 async def handle_type_selection(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
